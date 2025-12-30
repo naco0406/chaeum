@@ -3,8 +3,17 @@
 import { FC } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Bell, Moon, ChevronRight, HelpCircle, FileText } from 'lucide-react';
+import {
+  Bell,
+  Moon,
+  ChevronRight,
+  HelpCircle,
+  FileText,
+  Palette,
+  Calendar,
+} from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
+import { useLayout, LayoutMode } from '@/contexts/LayoutContext';
 
 interface SettingsListProps {
   contrastColor?: string;
@@ -94,6 +103,48 @@ const SettingsItem: FC<SettingsItemProps> = ({
   return <div className="px-0">{content}</div>;
 };
 
+// 레이아웃 모드 탭 컴포넌트
+const LayoutModeTabs: FC<{ contrastColor?: string }> = ({ contrastColor }) => {
+  const { layoutMode, setLayoutMode } = useLayout();
+  const textColor = contrastColor || 'currentColor';
+
+  const tabs: { mode: LayoutMode; icon: typeof Palette; label: string }[] = [
+    { mode: 'palette', icon: Palette, label: '컬러 팔레트' },
+    { mode: 'calendar', icon: Calendar, label: '캘린더' },
+  ];
+
+  return (
+    <div className="mb-4">
+      <p
+        className="text-xs mb-2 text-center"
+        style={{ color: textColor, opacity: 0.6 }}
+      >
+        기록 보기 방식
+      </p>
+      <div
+        className="flex gap-2 p-1 rounded-xl"
+        style={{ backgroundColor: `${textColor}08` }}
+      >
+        {tabs.map(({ mode, icon: Icon, label }) => (
+          <button
+            key={mode}
+            onClick={() => setLayoutMode(mode)}
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg transition-all"
+            style={{
+              backgroundColor: layoutMode === mode ? `${textColor}15` : 'transparent',
+              color: textColor,
+              opacity: layoutMode === mode ? 1 : 0.6,
+            }}
+          >
+            <Icon className="w-4 h-4" />
+            <span className="text-sm font-medium">{label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 export const SettingsList: FC<SettingsListProps> = ({ contrastColor }) => {
   const router = useRouter();
   const textColor = contrastColor || 'currentColor';
@@ -125,6 +176,10 @@ export const SettingsList: FC<SettingsListProps> = ({ contrastColor }) => {
       >
         설정
       </h3>
+
+      {/* 레이아웃 모드 탭 */}
+      <LayoutModeTabs contrastColor={contrastColor} />
+
       <div className="space-y-1">
         <SettingsItem
           icon={Bell}

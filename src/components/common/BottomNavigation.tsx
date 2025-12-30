@@ -4,9 +4,11 @@ import { FC, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Home, Calendar, User, LucideIcon, PenLine } from 'lucide-react';
-import { getColorByDate } from '@/lib/color-utils';
+import { Home, Calendar, User, LucideIcon, PenLine, BookOpen } from 'lucide-react';
+import { getColorByDate, getDayOfYear } from '@/lib/color-utils';
 import { createColorPalette } from '@/lib/color-contrast';
+import { useTodayDiary } from '@/hooks/useTodayDiary';
+import { useLayout } from '@/contexts/LayoutContext';
 
 interface NavItemData {
   href: string;
@@ -16,7 +18,7 @@ interface NavItemData {
 
 const navItems: NavItemData[] = [
   { href: '/', icon: Home, label: '오늘' },
-  { href: '/calendar', icon: Calendar, label: '캘린더' },
+  { href: '/records', icon: Calendar, label: '기록' },
   { href: '/profile', icon: User, label: '마이' },
 ];
 
@@ -28,6 +30,16 @@ export const BottomNavigation: FC = () => {
     () => createColorPalette(todayColor.hex),
     [todayColor.hex]
   );
+
+  // 오늘 일기 존재 여부 확인
+  const { hasTodayDiary, todayString } = useTodayDiary();
+  const { layoutMode } = useLayout();
+
+  // 레이아웃 모드에 따른 일기 상세 링크
+  const todayIndex = getDayOfYear(new Date());
+  const diaryViewHref = layoutMode === 'palette'
+    ? `/color/${todayIndex}`
+    : `/diary/${todayString}`;
 
   const isActive = (href: string): boolean => {
     if (href === '/') {
@@ -115,8 +127,8 @@ export const BottomNavigation: FC = () => {
             style={{ backgroundColor: palette.navTextMuted }}
           />
 
-          {/* 일기 쓰기 버튼 */}
-          <Link href="/diary/write">
+          {/* 일기 쓰기/보기 버튼 */}
+          <Link href={hasTodayDiary ? diaryViewHref : '/diary/write'}>
             <motion.div
               className="relative flex items-center justify-center w-11 h-11 rounded-full shadow-lg"
               style={{
@@ -127,7 +139,11 @@ export const BottomNavigation: FC = () => {
               whileTap={{ scale: 0.95 }}
               transition={{ type: 'spring', stiffness: 400, damping: 17 }}
             >
-              <PenLine className="w-5 h-5" strokeWidth={2.5} />
+              {hasTodayDiary ? (
+                <BookOpen className="w-5 h-5" strokeWidth={2.5} />
+              ) : (
+                <PenLine className="w-5 h-5" strokeWidth={2.5} />
+              )}
               {/* 글로우 효과 */}
               <div
                 className="absolute inset-0 rounded-full blur-lg -z-10 opacity-40"

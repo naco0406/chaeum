@@ -1,9 +1,9 @@
 'use client';
 
-import { FC, useState, useMemo, useEffect } from 'react';
+import { FC, useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { format, addDays, subDays } from 'date-fns';
+import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import {
@@ -15,64 +15,35 @@ import {
   Edit3,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { DeleteDiaryDialog } from '@/components/diary/DeleteDiaryDialog';
 import { useDiary } from '@/hooks/useDiary';
 import { useDeleteDiary } from '@/hooks/useDeleteDiary';
-import { getColorByDate } from '@/lib/color-utils';
+import { getColorByIndex } from '@/lib/color-utils';
 import { createColorPalette } from '@/lib/color-contrast';
 
-interface DiaryDetailProps {
-  dateString: string;
+interface ColorDetailProps {
+  colorIndex: number;
 }
 
-// 감정 이모지 매핑
-const MOOD_EMOJI: Record<string, string> = {
-  happy: '😊',
-  peaceful: '😌',
-  grateful: '🙏',
-  excited: '🤩',
-  tired: '😫',
-  anxious: '😰',
-  sad: '😢',
-  angry: '😠',
-};
-
-const MOOD_LABEL: Record<string, string> = {
-  happy: '행복',
-  peaceful: '평온',
-  grateful: '감사',
-  excited: '설렘',
-  tired: '피곤',
-  anxious: '불안',
-  sad: '슬픔',
-  angry: '화남',
-};
-
-export const DiaryDetail: FC<DiaryDetailProps> = ({ dateString }) => {
+export const ColorDetail: FC<ColorDetailProps> = ({ colorIndex }) => {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const date = new Date(dateString);
+  const currentYear = new Date().getFullYear();
+  const date = new Date(currentYear, 0, colorIndex);
+  const dateString = format(date, 'yyyy-MM-dd');
   const today = new Date();
-  const currentYear = today.getFullYear();
-  const yearStart = new Date(currentYear, 0, 1);
-  const yearEnd = new Date(currentYear, 11, 31);
-  const isToday = date.toDateString() === today.toDateString();
+  const isToday =
+    date.toDateString() === today.toDateString() &&
+    date.getFullYear() === today.getFullYear();
   const isFuture = date > today;
 
-  const color = useMemo(() => getColorByDate(date), [date]);
+  const color = useMemo(() => getColorByIndex(colorIndex), [colorIndex]);
   const palette = useMemo(() => createColorPalette(color.hex), [color.hex]);
 
   const { diary, isLoading } = useDiary(dateString);
   const { deleteDiary, isDeleting } = useDeleteDiary();
-
-  // 날짜 네비게이션
-  const prevDate = subDays(date, 1);
-  const nextDate = addDays(date, 1);
-  const canGoPrev = prevDate >= yearStart;
-  const canGoNext = nextDate <= yearEnd;
 
   // 마우스 패럴랙스
   const mouseX = useMotionValue(0);
@@ -84,7 +55,6 @@ export const DiaryDetail: FC<DiaryDetailProps> = ({ dateString }) => {
 
   useEffect(() => {
     setMounted(true);
-    // 동적 테마 색상 적용
     document.documentElement.style.backgroundColor = palette.darker;
     document.body.style.backgroundColor = palette.darker;
   }, [palette.darker]);
@@ -108,6 +78,9 @@ export const DiaryDetail: FC<DiaryDetailProps> = ({ dateString }) => {
       deleteDiary(diary.id);
     }
   };
+
+  const prevIndex = colorIndex > 1 ? colorIndex - 1 : null;
+  const nextIndex = colorIndex < 365 ? colorIndex + 1 : null;
 
   if (!mounted) {
     return (
@@ -175,10 +148,10 @@ export const DiaryDetail: FC<DiaryDetailProps> = ({ dateString }) => {
               </motion.button>
             </Link>
 
-            {/* 날짜 네비게이션 */}
+            {/* 색상 인덱스 네비게이션 */}
             <div className="flex items-center gap-2">
-              {canGoPrev ? (
-                <Link href={`/diary/${format(prevDate, 'yyyy-MM-dd')}`}>
+              {prevIndex && (
+                <Link href={`/color/${prevIndex}`}>
                   <motion.button
                     className="w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-md"
                     style={{
@@ -191,23 +164,21 @@ export const DiaryDetail: FC<DiaryDetailProps> = ({ dateString }) => {
                     <ChevronLeft className="w-4 h-4" />
                   </motion.button>
                 </Link>
-              ) : (
-                <div className="w-9" />
               )}
 
               <div
-                className="px-4 py-2 rounded-full text-sm"
+                className="px-4 py-2 rounded-full text-sm font-mono"
                 style={{
                   backgroundColor: palette.cardBg,
                   border: `1px solid ${palette.cardBorder}`,
                   color: palette.contrast,
                 }}
               >
-                {format(date, 'M월 d일', { locale: ko })}
+                {String(colorIndex).padStart(3, '0')} / 365
               </div>
 
-              {canGoNext ? (
-                <Link href={`/diary/${format(nextDate, 'yyyy-MM-dd')}`}>
+              {nextIndex && (
+                <Link href={`/color/${nextIndex}`}>
                   <motion.button
                     className="w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-md"
                     style={{
@@ -220,8 +191,6 @@ export const DiaryDetail: FC<DiaryDetailProps> = ({ dateString }) => {
                     <ChevronRight className="w-4 h-4" />
                   </motion.button>
                 </Link>
-              ) : (
-                <div className="w-9" />
               )}
             </div>
 
@@ -232,85 +201,91 @@ export const DiaryDetail: FC<DiaryDetailProps> = ({ dateString }) => {
         {/* 메인 콘텐츠 */}
         <main className="flex-1 px-4 pb-32 pt-32">
           <div className="max-w-[500px] mx-auto">
-            {/* 날짜 헤더 */}
+            {/* 매거진 스타일 색상 헤더 */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center mb-8"
+              transition={{ delay: 0.1 }}
+              className="text-center mb-10"
             >
-              <p
-                className="text-xs tracking-[0.3em] uppercase mb-2"
-                style={{ color: palette.contrast, opacity: 0.5 }}
+              {/* 큰 색상 원 */}
+              <motion.div
+                className="w-32 h-32 rounded-full mx-auto mb-8 shadow-2xl"
+                style={{
+                  backgroundColor: color.hex,
+                  boxShadow: `0 20px 60px ${color.hex}50`,
+                }}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', delay: 0.2 }}
+              />
+
+              {/* 색상 이름 - 대형 타이포그래피 */}
+              <motion.div
+                style={{ perspective: 1000, rotateX, rotateY }}
               >
-                {format(date, 'yyyy')} · {isToday ? '오늘' : format(date, 'EEEE', { locale: ko })}
-              </p>
-              <h1
-                className="text-4xl sm:text-5xl font-serif"
-                style={{ color: palette.contrast }}
-              >
-                {format(date, 'M월 d일', { locale: ko })}
-              </h1>
+                <h1
+                  className="text-5xl sm:text-6xl font-serif font-medium mb-3"
+                  style={{ color: palette.contrast }}
+                >
+                  {color.nameKo}
+                </h1>
+                <p
+                  className="text-lg tracking-[0.2em] uppercase"
+                  style={{ color: palette.contrast, opacity: 0.6 }}
+                >
+                  {color.nameEn}
+                </p>
+              </motion.div>
             </motion.div>
 
             {/* 색상 정보 카드 */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
+              transition={{ delay: 0.3 }}
               className="rounded-3xl backdrop-blur-md p-6 mb-6"
               style={{
                 backgroundColor: palette.cardBg,
                 border: `1px solid ${palette.cardBorder}`,
               }}
             >
-              <div className="flex items-center gap-4 mb-4">
-                {/* 색상 원 */}
-                <motion.div
-                  className="w-16 h-16 rounded-full shadow-lg flex-shrink-0"
-                  style={{
-                    backgroundColor: color.hex,
-                    boxShadow: `0 8px 24px ${color.hex}40`,
-                  }}
-                  whileHover={{ scale: 1.1 }}
-                />
-
-                <div className="flex-1">
-                  <h2
-                    className="text-2xl font-serif mb-1"
-                    style={{ color: palette.contrast }}
-                  >
-                    {color.nameKo}
-                  </h2>
-                  <p
-                    className="text-sm tracking-widest uppercase"
-                    style={{ color: palette.contrast, opacity: 0.6 }}
-                  >
-                    {color.nameEn}
-                  </p>
-                </div>
-
-                <div
-                  className="text-right font-mono text-sm"
-                  style={{ color: palette.contrast, opacity: 0.6 }}
+              {/* 날짜 */}
+              <div className="text-center mb-6">
+                <p
+                  className="text-xs tracking-widest uppercase mb-1"
+                  style={{ color: palette.contrast, opacity: 0.5 }}
                 >
-                  <p>No.{color.index}</p>
-                  <p>{color.hex.toUpperCase()}</p>
-                </div>
+                  {isToday ? '오늘' : isFuture ? '다가올 날' : '지난 날'}
+                </p>
+                <p
+                  className="text-xl font-serif"
+                  style={{ color: palette.contrast }}
+                >
+                  {format(date, 'M월 d일 EEEE', { locale: ko })}
+                </p>
               </div>
 
+              {/* 구분선 */}
+              <div
+                className="h-px w-16 mx-auto mb-6"
+                style={{ backgroundColor: `${palette.contrast}20` }}
+              />
+
+              {/* 설명 */}
               <p
-                className="text-sm leading-relaxed"
+                className="text-center text-lg leading-relaxed mb-6"
                 style={{ color: palette.contrast, opacity: 0.8 }}
               >
                 {color.description}
               </p>
 
               {/* 태그 */}
-              <div className="flex gap-2 mt-4">
+              <div className="flex justify-center gap-3 mb-6">
                 {[color.division, color.category].map((tag) => (
                   <span
                     key={tag}
-                    className="px-3 py-1 rounded-full text-xs"
+                    className="px-4 py-2 rounded-full text-xs tracking-wider"
                     style={{
                       backgroundColor: `${palette.contrast}10`,
                       color: palette.contrast,
@@ -321,16 +296,81 @@ export const DiaryDetail: FC<DiaryDetailProps> = ({ dateString }) => {
                   </span>
                 ))}
               </div>
+
+              {/* 색상 스펙 */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center">
+                  <p
+                    className="text-xs uppercase tracking-wider mb-1"
+                    style={{ color: palette.contrast, opacity: 0.5 }}
+                  >
+                    HEX
+                  </p>
+                  <p
+                    className="font-mono text-sm"
+                    style={{ color: palette.contrast }}
+                  >
+                    {color.hex.toUpperCase()}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p
+                    className="text-xs uppercase tracking-wider mb-1"
+                    style={{ color: palette.contrast, opacity: 0.5 }}
+                  >
+                    RGB
+                  </p>
+                  <p
+                    className="font-mono text-sm"
+                    style={{ color: palette.contrast }}
+                  >
+                    {color.rgb.r} {color.rgb.g} {color.rgb.b}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p
+                    className="text-xs uppercase tracking-wider mb-1"
+                    style={{ color: palette.contrast, opacity: 0.5 }}
+                  >
+                    NO.
+                  </p>
+                  <p
+                    className="font-mono text-sm"
+                    style={{ color: palette.contrast }}
+                  >
+                    {colorIndex}
+                  </p>
+                </div>
+              </div>
             </motion.div>
 
             {/* 일기 섹션 */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.4 }}
             >
               {isLoading ? (
-                <DiaryDetailSkeleton palette={palette} />
+                <div
+                  className="rounded-3xl backdrop-blur-md p-6 animate-pulse"
+                  style={{
+                    backgroundColor: palette.cardBg,
+                    border: `1px solid ${palette.cardBorder}`,
+                  }}
+                >
+                  <div
+                    className="h-4 w-1/3 rounded mb-4"
+                    style={{ backgroundColor: `${palette.contrast}20` }}
+                  />
+                  <div
+                    className="h-4 w-full rounded mb-2"
+                    style={{ backgroundColor: `${palette.contrast}10` }}
+                  />
+                  <div
+                    className="h-4 w-2/3 rounded"
+                    style={{ backgroundColor: `${palette.contrast}10` }}
+                  />
+                </div>
               ) : diary ? (
                 /* 일기 있음 */
                 <div
@@ -342,39 +382,36 @@ export const DiaryDetail: FC<DiaryDetailProps> = ({ dateString }) => {
                 >
                   {/* 일기 헤더 */}
                   <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      {diary.mood && (
-                        <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
-                          style={{
-                            backgroundColor: `${palette.contrast}15`,
-                          }}
-                        >
-                          {MOOD_EMOJI[diary.mood]}
-                        </div>
-                      )}
-                      <div>
-                        <p
-                          className="text-sm font-medium"
-                          style={{ color: palette.contrast }}
-                        >
-                          {diary.mood ? MOOD_LABEL[diary.mood] : '오늘의'} 기록
-                        </p>
-                        <p
-                          className="text-xs"
-                          style={{ color: palette.contrast, opacity: 0.5 }}
-                        >
-                          {format(new Date(diary.createdAt), 'a h:mm', {
-                            locale: ko,
-                          })}
-                        </p>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
+                        style={{
+                          backgroundColor: `${palette.contrast}15`,
+                          color: palette.contrast,
+                        }}
+                      >
+                        {diary.mood === 'happy' && '😊'}
+                        {diary.mood === 'peaceful' && '😌'}
+                        {diary.mood === 'grateful' && '🙏'}
+                        {diary.mood === 'excited' && '🤩'}
+                        {diary.mood === 'tired' && '😫'}
+                        {diary.mood === 'anxious' && '😰'}
+                        {diary.mood === 'sad' && '😢'}
+                        {diary.mood === 'angry' && '😠'}
+                        {!diary.mood && '📝'}
                       </div>
+                      <span
+                        className="text-sm font-medium"
+                        style={{ color: palette.contrast }}
+                      >
+                        오늘의 기록
+                      </span>
                     </div>
 
                     <div className="flex items-center gap-2">
                       <motion.button
                         onClick={handleEdit}
-                        className="w-10 h-10 rounded-full flex items-center justify-center"
+                        className="w-9 h-9 rounded-full flex items-center justify-center"
                         style={{
                           backgroundColor: `${palette.contrast}10`,
                           color: palette.contrast,
@@ -385,7 +422,7 @@ export const DiaryDetail: FC<DiaryDetailProps> = ({ dateString }) => {
                       </motion.button>
                       <motion.button
                         onClick={handleDelete}
-                        className="w-10 h-10 rounded-full flex items-center justify-center"
+                        className="w-9 h-9 rounded-full flex items-center justify-center"
                         style={{
                           backgroundColor: `${palette.contrast}10`,
                           color: palette.contrast,
@@ -397,18 +434,23 @@ export const DiaryDetail: FC<DiaryDetailProps> = ({ dateString }) => {
                     </div>
                   </div>
 
-                  {/* 구분선 */}
-                  <div
-                    className="h-px mb-4"
-                    style={{ backgroundColor: `${palette.contrast}15` }}
-                  />
-
                   {/* 일기 내용 */}
                   <p
                     className="text-base leading-relaxed whitespace-pre-wrap"
                     style={{ color: palette.contrast }}
                   >
                     {diary.content}
+                  </p>
+
+                  {/* 작성 시간 */}
+                  <p
+                    className="text-xs mt-4"
+                    style={{ color: palette.contrast, opacity: 0.5 }}
+                  >
+                    {format(new Date(diary.createdAt), 'M월 d일 HH:mm', {
+                      locale: ko,
+                    })}
+                    에 기록됨
                   </p>
                 </div>
               ) : isFuture ? (
@@ -476,46 +518,3 @@ export const DiaryDetail: FC<DiaryDetailProps> = ({ dateString }) => {
     </div>
   );
 };
-
-const DiaryDetailSkeleton: FC<{
-  palette: ReturnType<typeof createColorPalette>;
-}> = ({ palette }) => (
-  <div
-    className="rounded-3xl backdrop-blur-md p-6"
-    style={{
-      backgroundColor: palette.cardBg,
-      border: `1px solid ${palette.cardBorder}`,
-    }}
-  >
-    <div className="flex items-center gap-3 mb-4">
-      <Skeleton
-        className="w-10 h-10 rounded-full"
-        style={{ backgroundColor: `${palette.contrast}15` }}
-      />
-      <div className="space-y-2">
-        <Skeleton
-          className="w-20 h-4"
-          style={{ backgroundColor: `${palette.contrast}15` }}
-        />
-        <Skeleton
-          className="w-16 h-3"
-          style={{ backgroundColor: `${palette.contrast}10` }}
-        />
-      </div>
-    </div>
-    <div className="space-y-2">
-      <Skeleton
-        className="w-full h-4"
-        style={{ backgroundColor: `${palette.contrast}10` }}
-      />
-      <Skeleton
-        className="w-full h-4"
-        style={{ backgroundColor: `${palette.contrast}10` }}
-      />
-      <Skeleton
-        className="w-2/3 h-4"
-        style={{ backgroundColor: `${palette.contrast}10` }}
-      />
-    </div>
-  </div>
-);

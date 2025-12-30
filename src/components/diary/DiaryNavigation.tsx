@@ -22,10 +22,13 @@ export const DiaryNavigation: FC<DiaryNavigationProps> = ({
 }) => {
   const prevDate = subDays(currentDate, 1);
   const nextDate = addDays(currentDate, 1);
-  const today = new Date();
+  const currentYear = new Date().getFullYear();
+  const yearStart = new Date(currentYear, 0, 1);
+  const yearEnd = new Date(currentYear, 11, 31);
 
-  const isPrevDisabled = !hasPrevDiary;
-  const isNextDisabled = !hasNextDiary || nextDate > today;
+  // 같은 연도 내에서만 네비게이션 허용
+  const isPrevDisabled = !hasPrevDiary || prevDate < yearStart;
+  const isNextDisabled = !hasNextDiary || nextDate > yearEnd;
 
   const prevDateString = format(prevDate, 'yyyy-MM-dd');
   const nextDateString = format(nextDate, 'yyyy-MM-dd');
@@ -53,7 +56,7 @@ export const DiaryNavigation: FC<DiaryNavigationProps> = ({
         </Link>
       )}
 
-      <Link href="/calendar">
+      <Link href="/records">
         <motion.button
           className="px-4 py-2 rounded-xl text-sm font-medium"
           style={{
@@ -65,7 +68,7 @@ export const DiaryNavigation: FC<DiaryNavigationProps> = ({
           }}
           whileTap={{ scale: 0.95 }}
         >
-          캘린더
+          기록
         </motion.button>
       </Link>
 

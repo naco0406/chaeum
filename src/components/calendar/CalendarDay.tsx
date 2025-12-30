@@ -82,17 +82,21 @@ export const CalendarDay: FC<CalendarDayProps> = ({
         {day.dayOfMonth}
       </span>
 
-      {/* 색상 원 */}
+      {/* 색상 원 - 항상 그 날의 색상을 표시 */}
       <div className="relative">
-        {hasDiary ? (
-          <motion.div
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            className="w-7 h-7 rounded-full shadow-soft relative overflow-hidden"
-            style={{ backgroundColor: color.hex }}
-          >
-            {/* 하이라이트 */}
+        <motion.div
+          initial={hasDiary ? { scale: 0.5, opacity: 0 } : undefined}
+          animate={hasDiary ? { scale: 1, opacity: 1 } : undefined}
+          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+          className="w-7 h-7 rounded-full relative overflow-hidden"
+          style={{
+            backgroundColor: color.hex,
+            opacity: hasDiary ? 1 : 0.35,
+            boxShadow: hasDiary ? `0 2px 8px ${color.hex}40` : undefined,
+          }}
+        >
+          {/* 하이라이트 (일기 있을 때만) */}
+          {hasDiary && (
             <div
               className="absolute inset-0 opacity-30"
               style={{
@@ -100,22 +104,15 @@ export const CalendarDay: FC<CalendarDayProps> = ({
                   'radial-gradient(circle at 30% 30%, white 0%, transparent 50%)',
               }}
             />
-          </motion.div>
-        ) : (
-          <div
-            className="w-7 h-7 rounded-full border-2 border-dashed transition-colors"
-            style={{
-              borderColor: contrastColor ? `${contrastColor}25` : `${color.hex}30`,
-            }}
-          />
-        )}
+          )}
+        </motion.div>
 
-        {/* 일기 있음 마커 */}
+        {/* 일기 있음 마커 - 작은 점 */}
         {hasDiary && (
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2"
+            className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border"
             style={{
               backgroundColor: textColor,
               borderColor: color.hex,

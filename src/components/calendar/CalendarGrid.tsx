@@ -1,6 +1,7 @@
 'use client';
 
 import { FC } from 'react';
+import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CalendarDay } from '@/components/calendar/CalendarDay';
 import { CalendarDay as CalendarDayType } from '@/hooks/useCalendar';
@@ -75,7 +76,8 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
         >
           {days.map((day) => {
             const color = getColorByIndex(day.dayOfYear);
-            const dateKey = day.date.toISOString().split('T')[0];
+            // 로컬 시간대 기준으로 날짜 포맷 (UTC 변환 없이)
+            const dateKey = format(day.date, 'yyyy-MM-dd');
             const diary = diaries[dateKey];
 
             return (

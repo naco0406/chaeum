@@ -2,22 +2,26 @@
 
 import { FC, useState, useRef, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { format } from 'date-fns';
+import { format, isToday } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Loader2, Check, X } from 'lucide-react';
+import { ArrowLeft, Loader2, Check } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
-import { useDiaryForm } from '@/hooks/useDiaryForm';
+import { useDiary } from '@/hooks/useDiary';
 import { useDiaryMutation } from '@/hooks/useDiaryMutation';
 import { useAuth } from '@/providers/AuthProvider';
 import { DailyColor } from '@/types/color';
 import { DiaryMood } from '@/types/database';
 import { toast } from 'sonner';
 import { createColorPalette } from '@/lib/color-contrast';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { diarySchema, DiaryFormValues } from '@/lib/validations/diary';
 
 interface DiaryWriteClientProps {
   color: DailyColor;
   date: Date;
+  isEdit?: boolean;
 }
 
 // 감정 데이터
@@ -36,11 +40,33 @@ const MOOD_DATA: {
   { value: 'angry', label: '화남', description: '속상하고 답답한' },
 ];
 
-
-export const DiaryWriteClient: FC<DiaryWriteClientProps> = ({ color, date }) => {
+export const DiaryWriteClient: FC<DiaryWriteClientProps> = ({
+  color,
+  date,
+  isEdit = false,
+}) => {
   const { user } = useAuth();
-  const { form, characterCount, maxCharacters } = useDiaryForm();
-  const { saveDiary, isSubmitting } = useDiaryMutation();
+  const dateString = format(date, 'yyyy-MM-dd');
+  const isTodayDate = isToday(date);
+
+  // 기존 일기 로드 (편집 모드일 때)
+  const { diary: existingDiary, isLoading: isLoadingDiary } = useDiary(
+    isEdit ? dateString : ''
+  );
+
+  const form = useForm<DiaryFormValues>({
+    resolver: zodResolver(diarySchema),
+    defaultValues: {
+      content: '',
+      mood: null,
+    },
+  });
+
+  const content = form.watch('content');
+  const characterCount = content?.length || 0;
+  const maxCharacters = 500;
+
+  const { saveDiary, updateDiary, isSubmitting } = useDiaryMutation();
   const [showMoodSelector, setShowMoodSelector] = useState(false);
   const [mounted, setMounted] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -50,14 +76,21 @@ export const DiaryWriteClient: FC<DiaryWriteClientProps> = ({ color, date }) => 
   const selectedMood = form.watch('mood');
   const selectedMoodData = MOOD_DATA.find((m) => m.value === selectedMood);
 
-  // HSL 기반 대비색 팔레트 생성 (L <= 20 → 흰색, L > 20 → 검은색)
+  // HSL 기반 대비색 팔레트 생성
   const palette = useMemo(() => createColorPalette(color.hex), [color.hex]);
   const contrastColor = palette.contrast;
   const darkerColor = palette.darker;
 
+  // 기존 일기 데이터로 폼 초기화
+  useEffect(() => {
+    if (existingDiary && isEdit) {
+      form.setValue('content', existingDiary.content);
+      form.setValue('mood', existingDiary.mood as DiaryMood | null);
+    }
+  }, [existingDiary, isEdit, form]);
+
   useEffect(() => {
     setMounted(true);
-    // 배경 잘림 방지: body 배경색을 현재 색상으로 설정
     document.documentElement.style.backgroundColor = darkerColor;
     document.body.style.backgroundColor = darkerColor;
   }, [darkerColor]);
@@ -88,16 +121,32 @@ export const DiaryWriteClient: FC<DiaryWriteClientProps> = ({ color, date }) => 
       return;
     }
 
-    saveDiary({
-      content: values.content,
-      mood: values.mood,
-      date,
-      colorIndex: color.index,
-      userId: user.id,
-    });
+    if (isEdit && existingDiary) {
+      // 수정 모드
+      updateDiary({
+        id: existingDiary.id,
+        content: values.content,
+        mood: values.mood,
+      });
+    } else {
+      // 새로 작성
+      saveDiary({
+        content: values.content,
+        mood: values.mood,
+        date,
+        colorIndex: color.index,
+        userId: user.id,
+      });
+    }
   };
 
-  if (!mounted) {
+  // 날짜에 따른 텍스트
+  const getDateContextText = () => {
+    if (isTodayDate) return '오늘';
+    return `${formattedDate}`;
+  };
+
+  if (!mounted || (isEdit && isLoadingDiary)) {
     return (
       <div
         className="min-h-screen-dvh"
@@ -127,7 +176,7 @@ export const DiaryWriteClient: FC<DiaryWriteClientProps> = ({ color, date }) => 
       {/* 상단 네비게이션 */}
       <header className="fixed top-0 left-0 right-0 z-50 px-4 py-4">
         <div className="max-w-[500px] mx-auto flex items-center justify-between">
-          <Link href="/">
+          <Link href={isTodayDate ? '/' : `/diary/${dateString}`}>
             <motion.button
               className="w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-sm"
               style={{
@@ -149,7 +198,7 @@ export const DiaryWriteClient: FC<DiaryWriteClientProps> = ({ color, date }) => 
               className="text-xs tracking-widest uppercase"
               style={{ color: contrastColor, opacity: 0.6 }}
             >
-              {dayOfWeek}
+              {isTodayDate ? dayOfWeek : `${format(date, 'yyyy')} · ${dayOfWeek}`}
             </p>
             <p
               className="text-sm font-medium"
@@ -233,7 +282,9 @@ export const DiaryWriteClient: FC<DiaryWriteClientProps> = ({ color, date }) => 
                   </span>
                 </>
               ) : (
-                <span style={{ opacity: 0.6 }}>오늘의 감정을 선택하세요</span>
+                <span style={{ opacity: 0.6 }}>
+                  {isTodayDate ? '오늘의' : '그날의'} 감정을 선택하세요
+                </span>
               )}
             </button>
 
@@ -299,7 +350,11 @@ export const DiaryWriteClient: FC<DiaryWriteClientProps> = ({ color, date }) => 
             >
               <Textarea
                 ref={textareaRef}
-                placeholder="오늘은 어떤 하루였나요?&#10;&#10;기억하고 싶은 순간, 느꼈던 감정, 스쳐간 생각들...&#10;당신의 이야기를 들려주세요."
+                placeholder={
+                  isTodayDate
+                    ? '오늘은 어떤 하루였나요?\n\n기억하고 싶은 순간, 느꼈던 감정, 스쳐간 생각들...\n당신의 이야기를 들려주세요.'
+                    : `${formattedDate}은 어떤 하루였나요?\n\n그날의 기억, 느꼈던 감정, 스쳐간 생각들...\n당신의 이야기를 들려주세요.`
+                }
                 className="flex-1 min-h-[300px] resize-none border-0 bg-transparent p-0 text-base leading-relaxed focus-visible:ring-0 placeholder:leading-relaxed"
                 style={{
                   color: contrastColor,
@@ -361,8 +416,12 @@ export const DiaryWriteClient: FC<DiaryWriteClientProps> = ({ color, date }) => 
                   <Loader2 className="w-5 h-5 animate-spin" />
                   저장 중...
                 </>
-              ) : (
+              ) : isEdit ? (
+                '일기 수정하기'
+              ) : isTodayDate ? (
                 '오늘의 일기 저장하기'
+              ) : (
+                `${formattedDate} 일기 저장하기`
               )}
             </motion.button>
 
@@ -370,7 +429,7 @@ export const DiaryWriteClient: FC<DiaryWriteClientProps> = ({ color, date }) => 
               className="text-center text-xs mt-4"
               style={{ color: contrastColor, opacity: 0.4 }}
             >
-              {color.nameKo}의 하루를 기록합니다
+              {color.nameKo}의 {isTodayDate ? '하루' : '그날'}을 기록합니다
             </p>
           </motion.div>
         </div>

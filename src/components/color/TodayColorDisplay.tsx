@@ -5,10 +5,12 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
-import { PenLine } from 'lucide-react';
+import { PenLine, BookOpen } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DailyColor } from '@/types/color';
 import { createColorPalette } from '@/lib/color-contrast';
+import { useTodayDiary } from '@/hooks/useTodayDiary';
+import { useLayout } from '@/contexts/LayoutContext';
 
 interface TodayColorDisplayProps {
   color: DailyColor;
@@ -94,6 +96,15 @@ export const TodayColorDisplay: FC<TodayColorDisplayProps> = ({
 
   const [mounted, setMounted] = useState(false);
   const [time, setTime] = useState(0);
+
+  // 오늘 일기 존재 여부 확인
+  const { hasTodayDiary, todayString } = useTodayDiary();
+  const { layoutMode } = useLayout();
+
+  // 레이아웃 모드에 따른 일기 상세 링크
+  const diaryViewHref = layoutMode === 'palette'
+    ? `/color/${color.index}`
+    : `/diary/${todayString}`;
 
   useEffect(() => {
     setMounted(true);
@@ -411,8 +422,11 @@ export const TodayColorDisplay: FC<TodayColorDisplayProps> = ({
               </div>
             </div>
 
-            {/* 일기 쓰기 버튼 */}
-            <Link href="/diary/write" className="block">
+            {/* 일기 쓰기/보기 버튼 */}
+            <Link
+              href={hasTodayDiary ? diaryViewHref : '/diary/write'}
+              className="block"
+            >
               <motion.button
                 className="w-full py-5 rounded-2xl flex items-center justify-center gap-3 text-base font-medium transition-all"
                 style={{
@@ -422,8 +436,17 @@ export const TodayColorDisplay: FC<TodayColorDisplayProps> = ({
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <PenLine className="w-5 h-5" />
-                오늘의 이야기를 기록하세요
+                {hasTodayDiary ? (
+                  <>
+                    <BookOpen className="w-5 h-5" />
+                    오늘의 이야기 보러가기
+                  </>
+                ) : (
+                  <>
+                    <PenLine className="w-5 h-5" />
+                    오늘의 이야기를 기록하세요
+                  </>
+                )}
               </motion.button>
             </Link>
 
@@ -432,7 +455,9 @@ export const TodayColorDisplay: FC<TodayColorDisplayProps> = ({
               className="text-center text-xs mt-6"
               style={{ color: contrastColor, opacity: 0.4 }}
             >
-              {color.nameKo}의 하루를 시작하세요
+              {hasTodayDiary
+                ? `${color.nameKo}의 기록이 담겨있어요`
+                : `${color.nameKo}의 하루를 시작하세요`}
             </p>
           </div>
         </motion.footer>

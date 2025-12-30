@@ -31,7 +31,7 @@ export const DiaryDetailHeader: FC<DiaryDetailHeaderProps> = ({
 
   return (
     <header className="flex items-center justify-between py-4">
-      <Link href="/calendar">
+      <Link href="/records">
         <motion.button
           className="w-10 h-10 rounded-full flex items-center justify-center"
           style={{

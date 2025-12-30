@@ -69,7 +69,6 @@ export const MonthCalendar: FC = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="text-center"
           >
             <p
               className="text-sm mb-1 tracking-widest uppercase"
@@ -162,17 +161,21 @@ export const MonthCalendar: FC = () => {
               <div
                 className="w-5 h-5 rounded-full"
                 style={{
-                  background: `linear-gradient(135deg, ${todayColor.hex} 0%, ${palette.darker} 100%)`,
+                  backgroundColor: todayColor.hex,
+                  boxShadow: `0 2px 8px ${todayColor.hex}40`,
                 }}
               />
-              <span>일기 작성</span>
+              <span>기록됨</span>
             </div>
             <div className="flex items-center gap-2">
               <div
-                className="w-5 h-5 rounded-full border-2 border-dashed"
-                style={{ borderColor: `${palette.contrast}30` }}
+                className="w-5 h-5 rounded-full"
+                style={{
+                  backgroundColor: todayColor.hex,
+                  opacity: 0.35,
+                }}
               />
-              <span>미작성</span>
+              <span>미기록</span>
             </div>
           </motion.div>
 

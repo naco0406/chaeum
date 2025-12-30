@@ -26,7 +26,7 @@ export const useDeleteDiary = () => {
       toast.success('일기가 삭제되었습니다.');
       queryClient.invalidateQueries({ queryKey: ['diaries'] });
       queryClient.invalidateQueries({ queryKey: ['diary'] });
-      router.push('/calendar');
+      router.push('/records');
     },
     onError: (error) => {
       console.error('Failed to delete diary:', error);
