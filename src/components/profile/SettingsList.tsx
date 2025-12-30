@@ -57,10 +57,9 @@ const SettingsItem: FC<SettingsItemProps> = ({
           backgroundColor: contrastColor ? `${contrastColor}10` : 'var(--secondary-50)',
         }}
       >
-        <Icon
-          className="w-4 h-4"
-          style={{ color: textColor, opacity: 0.7 }}
-        />
+        <span style={{ color: textColor, opacity: 0.7 }}>
+          <Icon className="w-4 h-4" />
+        </span>
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium" style={{ color: textColor }}>

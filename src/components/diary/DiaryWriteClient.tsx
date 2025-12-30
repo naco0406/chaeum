@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, useState, useRef, useEffect, useMemo } from 'react';
+import { FC, useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { format, isToday } from 'date-fns';
 import { ko } from 'date-fns/locale';
@@ -69,7 +69,6 @@ export const DiaryWriteClient: FC<DiaryWriteClientProps> = ({
   const { saveDiary, updateDiary, isSubmitting } = useDiaryMutation();
   const [showMoodSelector, setShowMoodSelector] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const formattedDate = format(date, 'M월 d일', { locale: ko });
   const dayOfWeek = format(date, 'EEEE', { locale: ko });
@@ -349,7 +348,6 @@ export const DiaryWriteClient: FC<DiaryWriteClientProps> = ({
               }}
             >
               <Textarea
-                ref={textareaRef}
                 placeholder={
                   isTodayDate
                     ? '오늘은 어떤 하루였나요?\n\n기억하고 싶은 순간, 느꼈던 감정, 스쳐간 생각들...\n당신의 이야기를 들려주세요.'

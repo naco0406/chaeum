@@ -1,12 +1,13 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
 import { parse, isValid, isFuture } from 'date-fns';
 import { getColorByDate } from '@/lib/color-utils';
 import { DiaryWriteClient } from '@/components/diary/DiaryWriteClient';
 
-export default function DiaryWritePage() {
+function DiaryWriteContent() {
   const searchParams = useSearchParams();
   const dateParam = searchParams.get('date');
   const isEdit = searchParams.get('edit') === 'true';
@@ -28,4 +29,18 @@ export default function DiaryWritePage() {
   const color = useMemo(() => getColorByDate(targetDate), [targetDate]);
 
   return <DiaryWriteClient color={color} date={targetDate} isEdit={isEdit} />;
+}
+
+function DiaryWriteLoading() {
+  return (
+    <div className="min-h-screen-dvh bg-neutral-100 animate-pulse" />
+  );
+}
+
+export default function DiaryWritePage() {
+  return (
+    <Suspense fallback={<DiaryWriteLoading />}>
+      <DiaryWriteContent />
+    </Suspense>
+  );
 }

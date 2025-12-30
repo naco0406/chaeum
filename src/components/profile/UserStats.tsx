@@ -41,10 +41,9 @@ const StatItem: FC<StatItemProps> = ({
         className="w-10 h-10 rounded-full flex items-center justify-center mb-2"
         style={{ backgroundColor: contrastColor ? `${contrastColor}15` : undefined }}
       >
-        <Icon
-          className="w-5 h-5"
-          style={{ color: textColor, opacity: 0.8 }}
-        />
+        <span style={{ color: textColor, opacity: 0.8 }}>
+          <Icon className="w-5 h-5" />
+        </span>
       </div>
       <p className="text-2xl font-serif" style={{ color: textColor }}>
         {value}

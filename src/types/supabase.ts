@@ -1,5 +1,13 @@
 import { DiaryMood } from '@/types/database';
 
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
+
 export interface Database {
   public: {
     Tables: {
@@ -25,6 +33,7 @@ export interface Database {
           avatar_url?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       diaries: {
         Row: {
@@ -60,12 +69,28 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: 'diaries_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          }
+        ];
       };
     };
-    Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      [_ in never]: never;
+    };
     Enums: {
       diary_mood: DiaryMood;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
     };
   };
 }
