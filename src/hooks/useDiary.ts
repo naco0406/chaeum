@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
+import { mapDiaryFromDB } from '@/lib/supabase/mappers';
 import { Diary } from '@/types/database';
 
 const fetchDiary = async (date: string): Promise<Diary | null> => {
@@ -20,17 +21,7 @@ const fetchDiary = async (date: string): Promise<Diary | null> => {
 
   if (!data) return null;
 
-  return {
-    id: data.id,
-    userId: data.user_id,
-    date: data.date,
-    dayOfYear: data.day_of_year,
-    content: data.content,
-    mood: data.mood,
-    colorIndex: data.color_index,
-    createdAt: data.created_at,
-    updatedAt: data.updated_at,
-  };
+  return mapDiaryFromDB(data);
 };
 
 export const useDiary = (date: string) => {

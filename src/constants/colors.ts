@@ -1,17 +1,17 @@
-import { DailyColor } from '@/types/color';
+import { DailyColor } from '@/data/colors/schema';
 
 export const DAILY_COLORS: DailyColor[] = [
   {
     index: 1,
-    nameKo: '첫눈빛',
-    nameEn: 'First Snow White',
-    description: '새해 첫날, 세상을 덮은 순백의 첫눈처럼',
-    division: '흰색계',
-    category: '자연현상',
-    hex: '#F8F6F0',
-    rgb: { r: 248, g: 246, b: 240 },
-    cmyk: { c: 0, m: 1, y: 3, k: 3 },
-    munsell: '5Y 9.5/0.5',
+    nameKo: '팥죽빛',
+    nameEn: 'Red Bean Porridge',
+    description: '동지날 따뜻하게 끓인 팥죽의 깊고 붉은 빛깔',
+    division: '빨강계',
+    category: '음식',
+    hex: '#733738',
+    rgb: { r: 115, g: 55, b: 56 },
+    cmyk: { c: 0, m: 52, y: 51, k: 55 },
+    munsell: '5R 3/6',
   },
   {
     index: 2,

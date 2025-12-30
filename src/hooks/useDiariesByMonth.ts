@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { startOfMonth, endOfMonth, format } from 'date-fns';
 import { createClient } from '@/lib/supabase/client';
+import { mapDiariesToDateMap } from '@/lib/supabase/mappers';
 import { Diary } from '@/types/database';
 
 interface DiaryMap {
@@ -28,22 +29,7 @@ const fetchDiariesByMonth = async (
     throw error;
   }
 
-  const diaryMap: DiaryMap = {};
-  data?.forEach((diary) => {
-    diaryMap[diary.date] = {
-      id: diary.id,
-      userId: diary.user_id,
-      date: diary.date,
-      dayOfYear: diary.day_of_year,
-      content: diary.content,
-      mood: diary.mood,
-      colorIndex: diary.color_index,
-      createdAt: diary.created_at,
-      updatedAt: diary.updated_at,
-    };
-  });
-
-  return diaryMap;
+  return mapDiariesToDateMap(data ?? []);
 };
 
 export const useDiariesByMonth = (year: number, month: number) => {

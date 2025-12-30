@@ -4,6 +4,13 @@ import { useQuery } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/providers/AuthProvider';
 import { startOfDay, parseISO, differenceInDays } from 'date-fns';
+import { Database } from '@/types/supabase';
+
+// Supabase에서 반환하는 타입 추출
+type DiaryDateRow = Pick<
+  Database['public']['Tables']['diaries']['Row'],
+  'date' | 'created_at'
+>;
 
 interface UserStats {
   totalDiaries: number;
@@ -113,7 +120,8 @@ export const useUserStats = () => {
         throw error;
       }
 
-      const dates = diaries?.map((d) => d.date) || [];
+      const typedDiaries: DiaryDateRow[] = diaries ?? [];
+      const dates = typedDiaries.map((d) => d.date);
       const { current, longest } = calculateStreak(dates);
 
       // Get day of week distribution
