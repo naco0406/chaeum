@@ -58,19 +58,21 @@ export const BottomNavigation: FC = () => {
                 className="relative flex items-center justify-center"
               >
                 <motion.div
-                  className={`relative flex items-center justify-center w-12 h-11 rounded-full transition-colors ${
-                    active
-                      ? 'text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
+                  className="relative flex items-center justify-center w-12 h-11 rounded-full transition-colors"
+                  style={{
+                    color: active
+                      ? 'var(--theme-color-contrast)'
+                      : undefined,
+                  }}
                   whileTap={{ scale: 0.92 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                 >
-                  {/* 활성 상태 배경 */}
+                  {/* 활성 상태 배경 - 테마 색상 */}
                   {active && (
                     <motion.div
                       layoutId="nav-active-bg"
-                      className="absolute inset-0 bg-primary rounded-full"
+                      className="absolute inset-0 rounded-full"
+                      style={{ backgroundColor: 'var(--theme-color)' }}
                       transition={{
                         type: 'spring',
                         stiffness: 400,
@@ -81,7 +83,9 @@ export const BottomNavigation: FC = () => {
 
                   {/* 아이콘 */}
                   <motion.div
-                    className="relative z-10"
+                    className={`relative z-10 ${
+                      !active ? 'text-muted-foreground hover:text-foreground' : ''
+                    }`}
                     animate={active ? { scale: [1, 1.1, 1] } : { scale: 1 }}
                     transition={{ duration: 0.25 }}
                   >
@@ -95,17 +99,24 @@ export const BottomNavigation: FC = () => {
           {/* 구분선 */}
           <div className="w-px h-6 bg-border/50 mx-1" />
 
-          {/* 일기 쓰기 버튼 */}
+          {/* 일기 쓰기 버튼 - 테마 색상 */}
           <Link href="/diary/write">
             <motion.div
-              className="relative flex items-center justify-center w-11 h-11 rounded-full bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg"
+              className="relative flex items-center justify-center w-11 h-11 rounded-full shadow-lg"
+              style={{
+                background: `linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color-dark) 100%)`,
+                color: 'var(--theme-color-contrast)',
+              }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               transition={{ type: 'spring', stiffness: 400, damping: 17 }}
             >
               <PenLine className="w-5 h-5" strokeWidth={2.5} />
-              {/* 글로우 효과 */}
-              <div className="absolute inset-0 rounded-full bg-primary/30 blur-lg -z-10" />
+              {/* 글로우 효과 - 테마 색상 */}
+              <div
+                className="absolute inset-0 rounded-full blur-lg -z-10"
+                style={{ backgroundColor: 'var(--theme-color-muted)' }}
+              />
             </motion.div>
           </Link>
         </div>

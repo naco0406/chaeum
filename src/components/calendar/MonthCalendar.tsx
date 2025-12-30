@@ -71,20 +71,29 @@ export const MonthCalendar: FC = () => {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="grid grid-cols-3 gap-3"
         >
-          <div className="text-center p-4 rounded-2xl glass border border-border/30">
-            <p className="text-2xl font-serif text-primary">
+          <div className="text-center p-4 rounded-2xl glass-theme border border-border/30">
+            <p
+              className="text-2xl font-serif"
+              style={{ color: 'var(--theme-color)' }}
+            >
               {monthStats.diaryCount}
             </p>
             <p className="text-xs text-muted-foreground mt-1">작성한 일기</p>
           </div>
-          <div className="text-center p-4 rounded-2xl glass border border-border/30">
-            <p className="text-2xl font-serif text-primary">
+          <div className="text-center p-4 rounded-2xl glass-theme border border-border/30">
+            <p
+              className="text-2xl font-serif"
+              style={{ color: 'var(--theme-color)' }}
+            >
               {monthStats.daysInMonth}
             </p>
             <p className="text-xs text-muted-foreground mt-1">이번 달 일수</p>
           </div>
-          <div className="text-center p-4 rounded-2xl glass border border-border/30">
-            <p className="text-2xl font-serif text-primary">
+          <div className="text-center p-4 rounded-2xl glass-theme border border-border/30">
+            <p
+              className="text-2xl font-serif"
+              style={{ color: 'var(--theme-color)' }}
+            >
               {monthStats.percentage}%
             </p>
             <p className="text-xs text-muted-foreground mt-1">달성률</p>
@@ -122,7 +131,12 @@ export const MonthCalendar: FC = () => {
           className="flex items-center justify-center gap-8 text-xs text-muted-foreground"
         >
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-damcheong to-damcheong/70 shadow-soft" />
+            <div
+              className="w-5 h-5 rounded-full shadow-soft"
+              style={{
+                background: `linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color-dark) 100%)`,
+              }}
+            />
             <span>일기 작성</span>
           </div>
           <div className="flex items-center gap-2">

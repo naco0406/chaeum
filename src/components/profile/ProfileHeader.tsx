@@ -32,16 +32,23 @@ export const ProfileHeader: FC<ProfileHeaderProps> = ({ user }) => {
         <div className="relative mb-4">
           <Avatar className="w-20 h-20 border-4 border-background shadow-soft">
             {avatarUrl && <AvatarImage src={avatarUrl} alt={displayName} />}
-            <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/5 text-primary text-xl font-serif">
+            <AvatarFallback
+              className="text-xl font-serif"
+              style={{
+                background: `linear-gradient(135deg, rgba(var(--theme-color-rgb), 0.2) 0%, rgba(var(--theme-color-rgb), 0.05) 100%)`,
+                color: 'var(--theme-color)',
+              }}
+            >
               {initials}
             </AvatarFallback>
           </Avatar>
           {/* 장식 링 */}
           <motion.div
-            className="absolute inset-0 rounded-full border-2 border-dashed border-primary/20"
+            className="absolute inset-0 rounded-full border-2 border-dashed"
+            style={{ borderColor: 'rgba(var(--theme-color-rgb), 0.2)' }}
             animate={{ rotate: 360 }}
             transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-            style={{ transform: 'scale(1.3)' }}
+            initial={{ transform: 'scale(1.3)' }}
           />
         </div>
 

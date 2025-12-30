@@ -46,8 +46,13 @@ const LoginPrompt: FC = () => {
           transition={{ type: 'spring', stiffness: 200, damping: 15 }}
           className="relative inline-block"
         >
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-secondary to-secondary/50 flex items-center justify-center mx-auto">
-            <User className="w-12 h-12 text-muted-foreground" />
+          <div
+            className="w-24 h-24 rounded-full flex items-center justify-center mx-auto"
+            style={{
+              background: `linear-gradient(135deg, rgba(var(--theme-color-rgb), 0.15) 0%, rgba(var(--theme-color-rgb), 0.05) 100%)`,
+            }}
+          >
+            <User className="w-12 h-12" style={{ color: 'var(--theme-color)' }} />
           </div>
           <motion.div
             initial={{ opacity: 0 }}
@@ -55,7 +60,7 @@ const LoginPrompt: FC = () => {
             transition={{ delay: 0.5 }}
             className="absolute -top-1 -right-1"
           >
-            <Sparkles className="w-6 h-6 text-primary/60" />
+            <Sparkles className="w-6 h-6" style={{ color: 'var(--theme-color)', opacity: 0.6 }} />
           </motion.div>
         </motion.div>
 
@@ -71,6 +76,10 @@ const LoginPrompt: FC = () => {
         <div className="space-y-3">
           <Button
             className="w-full h-12 rounded-xl text-base"
+            style={{
+              background: `linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color-dark) 100%)`,
+              color: 'var(--theme-color-contrast)',
+            }}
             onClick={() => router.push('/login')}
           >
             로그인
@@ -78,6 +87,10 @@ const LoginPrompt: FC = () => {
           <Button
             variant="outline"
             className="w-full h-12 rounded-xl text-base"
+            style={{
+              borderColor: 'var(--theme-color-muted)',
+              color: 'var(--theme-color)',
+            }}
             onClick={() => router.push('/signup')}
           >
             회원가입

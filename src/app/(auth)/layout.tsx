@@ -64,12 +64,23 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative ink-gradient hanji-texture">
       <FloatingCircles />
 
+      {/* 테마 색상 그라데이션 */}
+      <div
+        className="fixed inset-0 pointer-events-none transition-colors duration-1000"
+        style={{
+          background: `radial-gradient(ellipse 100% 60% at 50% 0%, var(--theme-color-muted) 0%, transparent 50%)`,
+        }}
+      />
+
       {/* 상단 장식 */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none"
+        className="absolute top-0 left-0 right-0 h-40 pointer-events-none"
+        style={{
+          background: `linear-gradient(to bottom, rgba(var(--theme-color-rgb), 0.08) 0%, transparent 100%)`,
+        }}
       />
 
       {/* 콘텐츠 */}
@@ -87,7 +98,10 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.5 }}
-        className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none"
+        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
+        style={{
+          background: `linear-gradient(to top, rgba(var(--theme-color-rgb), 0.05) 0%, transparent 100%)`,
+        }}
       />
     </div>
   );

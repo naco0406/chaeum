@@ -559,6 +559,123 @@
     background-size: 200% 200%;
     animation: gradient-shift 8s ease infinite;
   }
+
+  /* ========================================
+   * 테마 색상 유틸리티 (오늘의 색상)
+   * ThemeColorProvider에서 동적으로 설정됨
+   * ======================================== */
+
+  /* 테마 색상 배경 */
+  .bg-theme {
+    background-color: var(--theme-color);
+  }
+
+  .bg-theme-light {
+    background-color: var(--theme-color-light);
+  }
+
+  .bg-theme-dark {
+    background-color: var(--theme-color-dark);
+  }
+
+  .bg-theme-muted {
+    background-color: var(--theme-color-muted);
+  }
+
+  .bg-theme-subtle {
+    background-color: var(--theme-color-subtle);
+  }
+
+  /* 테마 색상 텍스트 */
+  .text-theme {
+    color: var(--theme-color);
+  }
+
+  .text-theme-light {
+    color: var(--theme-color-light);
+  }
+
+  .text-theme-dark {
+    color: var(--theme-color-dark);
+  }
+
+  .text-theme-contrast {
+    color: var(--theme-color-contrast);
+  }
+
+  /* 테마 색상 테두리 */
+  .border-theme {
+    border-color: var(--theme-color);
+  }
+
+  .border-theme-muted {
+    border-color: var(--theme-color-muted);
+  }
+
+  /* 테마 그라데이션 배경 */
+  .theme-gradient {
+    background: linear-gradient(
+      180deg,
+      var(--theme-gradient-start) 0%,
+      var(--theme-gradient-end) 100%
+    );
+  }
+
+  .theme-gradient-radial {
+    background: radial-gradient(
+      ellipse at 50% 0%,
+      var(--theme-color-muted) 0%,
+      transparent 60%
+    );
+  }
+
+  .theme-gradient-radial-bottom {
+    background: radial-gradient(
+      ellipse at 50% 100%,
+      var(--theme-color-subtle) 0%,
+      transparent 50%
+    );
+  }
+
+  /* 테마 글로우 효과 */
+  .theme-glow {
+    box-shadow: 0 0 40px -10px var(--theme-color),
+                0 0 80px -20px var(--theme-color);
+  }
+
+  .theme-glow-sm {
+    box-shadow: 0 0 20px -5px var(--theme-color);
+  }
+
+  .theme-glow-lg {
+    box-shadow: 0 0 60px -10px var(--theme-color),
+                0 0 120px -30px var(--theme-color);
+  }
+
+  /* 테마 링 (포커스) */
+  .ring-theme {
+    --tw-ring-color: var(--theme-color-muted);
+  }
+
+  /* 테마 색상 글래스모피즘 */
+  .glass-theme {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--theme-color-rgb), 0.1) 0%,
+      rgba(var(--theme-color-rgb), 0.05) 100%
+    );
+    backdrop-filter: blur(12px) saturate(1.5);
+    -webkit-backdrop-filter: blur(12px) saturate(1.5);
+  }
+
+  /* 테마 색상 호버 */
+  .hover-theme:hover {
+    background-color: var(--theme-color-subtle);
+  }
+
+  .hover-theme-glow:hover {
+    box-shadow: 0 0 30px -5px var(--theme-color);
+  }
 }
 
 /* 스피너 애니메이션 */

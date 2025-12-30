@@ -18,8 +18,23 @@ export const MainLayout: FC<MainLayoutProps> = ({ children }) => {
   );
 
   return (
-    <div className="min-h-screen ink-gradient hanji-texture">
-      <main className={shouldHideNav ? '' : 'pb-28'}>{children}</main>
+    <div className="min-h-screen ink-gradient hanji-texture relative overflow-hidden">
+      {/* 테마 색상 배경 그라데이션 */}
+      <div
+        className="fixed inset-0 pointer-events-none transition-colors duration-1000"
+        style={{
+          background: `radial-gradient(ellipse 80% 50% at 50% -10%, var(--theme-color-muted) 0%, transparent 50%)`,
+        }}
+      />
+      <div
+        className="fixed inset-0 pointer-events-none transition-colors duration-1000"
+        style={{
+          background: `radial-gradient(ellipse 60% 40% at 100% 100%, var(--theme-color-subtle) 0%, transparent 40%)`,
+        }}
+      />
+      <main className={`relative z-10 ${shouldHideNav ? '' : 'pb-28'}`}>
+        {children}
+      </main>
       {!shouldHideNav && <BottomNavigation />}
     </div>
   );

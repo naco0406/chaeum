@@ -86,9 +86,15 @@ export const SignupForm: FC = () => {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-          className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-bichwi/30 to-bichwi/10 flex items-center justify-center"
+          className="w-24 h-24 mx-auto rounded-full flex items-center justify-center"
+          style={{
+            background: `linear-gradient(135deg, rgba(var(--theme-color-rgb), 0.3) 0%, rgba(var(--theme-color-rgb), 0.1) 100%)`,
+          }}
         >
-          <CheckCircle2 className="w-12 h-12 text-bichwi" />
+          <CheckCircle2
+            className="w-12 h-12"
+            style={{ color: 'var(--theme-color)' }}
+          />
         </motion.div>
 
         <div>
@@ -103,6 +109,10 @@ export const SignupForm: FC = () => {
         <Button
           onClick={() => router.push('/login')}
           className="rounded-xl h-12 px-8"
+          style={{
+            background: `linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color-dark) 100%)`,
+            color: 'var(--theme-color-contrast)',
+          }}
         >
           로그인하기
         </Button>
@@ -124,9 +134,17 @@ export const SignupForm: FC = () => {
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-            className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center"
+            className="w-20 h-20 mx-auto rounded-full flex items-center justify-center"
+            style={{
+              background: `linear-gradient(135deg, rgba(var(--theme-color-rgb), 0.2) 0%, rgba(var(--theme-color-rgb), 0.05) 100%)`,
+            }}
           >
-            <span className="text-4xl font-serif text-primary">채</span>
+            <span
+              className="text-4xl font-serif"
+              style={{ color: 'var(--theme-color)' }}
+            >
+              채
+            </span>
           </motion.div>
           <motion.div
             initial={{ opacity: 0 }}
@@ -134,7 +152,10 @@ export const SignupForm: FC = () => {
             transition={{ delay: 0.5 }}
             className="absolute -top-1 -right-1"
           >
-            <Sparkles className="w-5 h-5 text-primary/60" />
+            <Sparkles
+              className="w-5 h-5"
+              style={{ color: 'var(--theme-color)', opacity: 0.6 }}
+            />
           </motion.div>
         </div>
 
@@ -233,6 +254,10 @@ export const SignupForm: FC = () => {
             <Button
               type="submit"
               className="w-full h-12 rounded-xl text-base font-medium shadow-soft"
+              style={{
+                background: `linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color-dark) 100%)`,
+                color: 'var(--theme-color-contrast)',
+              }}
               disabled={isLoading}
             >
               {isLoading ? (
@@ -258,7 +283,8 @@ export const SignupForm: FC = () => {
         이미 계정이 있으신가요?{' '}
         <Link
           href="/login"
-          className="text-primary hover:underline font-medium transition-colors"
+          className="hover:underline font-medium transition-colors"
+          style={{ color: 'var(--theme-color)' }}
         >
           로그인
         </Link>

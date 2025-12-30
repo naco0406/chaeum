@@ -73,9 +73,17 @@ export const LoginForm: FC = () => {
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-            className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center"
+            className="w-20 h-20 mx-auto rounded-full flex items-center justify-center"
+            style={{
+              background: `linear-gradient(135deg, rgba(var(--theme-color-rgb), 0.2) 0%, rgba(var(--theme-color-rgb), 0.05) 100%)`,
+            }}
           >
-            <span className="text-4xl font-serif text-primary">채</span>
+            <span
+              className="text-4xl font-serif"
+              style={{ color: 'var(--theme-color)' }}
+            >
+              채
+            </span>
           </motion.div>
           <motion.div
             initial={{ opacity: 0 }}
@@ -83,7 +91,10 @@ export const LoginForm: FC = () => {
             transition={{ delay: 0.5 }}
             className="absolute -top-1 -right-1"
           >
-            <Sparkles className="w-5 h-5 text-primary/60" />
+            <Sparkles
+              className="w-5 h-5"
+              style={{ color: 'var(--theme-color)', opacity: 0.6 }}
+            />
           </motion.div>
         </div>
 
@@ -158,6 +169,10 @@ export const LoginForm: FC = () => {
             <Button
               type="submit"
               className="w-full h-12 rounded-xl text-base font-medium shadow-soft"
+              style={{
+                background: `linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color-dark) 100%)`,
+                color: 'var(--theme-color-contrast)',
+              }}
               disabled={isLoading}
             >
               {isLoading ? (
@@ -183,7 +198,8 @@ export const LoginForm: FC = () => {
         계정이 없으신가요?{' '}
         <Link
           href="/signup"
-          className="text-primary hover:underline font-medium transition-colors"
+          className="hover:underline font-medium transition-colors"
+          style={{ color: 'var(--theme-color)' }}
         >
           회원가입
         </Link>
