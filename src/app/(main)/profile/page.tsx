@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/providers/AuthProvider';
 import { ImmersiveBackground } from '@/components/common/ImmersiveBackground';
+import { BrandHeader } from '@/components/profile/BrandHeader';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { UserStats } from '@/components/profile/UserStats';
 import { SettingsList } from '@/components/profile/SettingsList';
@@ -170,29 +171,9 @@ const ProfilePage: FC = () => {
 
   return (
     <ImmersiveBackground color={todayColor.hex}>
-      <div className="px-4 pt-6 pb-32">
-        <div className="max-w-[430px] mx-auto space-y-6">
-          {/* 헤더 */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-2"
-          >
-            <p
-              className="text-sm mb-1 tracking-widest uppercase"
-              style={{ color: palette.contrast, opacity: 0.6 }}
-            >
-              나의 공간
-            </p>
-            <h1
-              className="text-2xl font-serif"
-              style={{ color: palette.contrast }}
-            >
-              마이페이지
-            </h1>
-          </motion.div>
-
+      <div className="px-4 pt-4 pb-32">
+        <div className="max-w-[430px] mx-auto space-y-4">
+          <BrandHeader contrastColor={palette.contrast} />
           <ProfileHeader user={user} contrastColor={palette.contrast} />
           <UserStats contrastColor={palette.contrast} />
           <SettingsList contrastColor={palette.contrast} />
