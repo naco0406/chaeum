@@ -1,10 +1,8 @@
 'use client';
 
-import { FC, useMemo } from 'react';
+import { FC, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { User, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/providers/AuthProvider';
 import { ImmersiveBackground } from '@/components/common/ImmersiveBackground';
@@ -49,101 +47,8 @@ const ProfileSkeleton: FC<{ palette: ReturnType<typeof createColorPalette> }> = 
   );
 };
 
-const LoginPrompt: FC<{ palette: ReturnType<typeof createColorPalette> }> = ({
-  palette,
-}) => {
-  const router = useRouter();
-
-  return (
-    <div className="flex flex-col items-center justify-center px-4 py-20">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="max-w-[430px] w-full text-center space-y-8"
-      >
-        {/* 카드 */}
-        <div
-          className="p-8 rounded-3xl backdrop-blur-md"
-          style={{
-            backgroundColor: palette.cardBg,
-            border: `1px solid ${palette.cardBorder}`,
-          }}
-        >
-          {/* 아이콘 */}
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-            className="relative inline-block mb-6"
-          >
-            <div
-              className="w-24 h-24 rounded-full flex items-center justify-center mx-auto"
-              style={{
-                backgroundColor: palette.cardBg,
-                border: `1px solid ${palette.cardBorder}`,
-              }}
-            >
-              <User className="w-12 h-12" style={{ color: palette.contrast }} />
-            </div>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="absolute -top-1 -right-1"
-            >
-              <Sparkles
-                className="w-6 h-6"
-                style={{ color: palette.contrast, opacity: 0.6 }}
-              />
-            </motion.div>
-          </motion.div>
-
-          {/* 텍스트 */}
-          <div className="space-y-2 mb-8">
-            <h1
-              className="text-2xl font-serif"
-              style={{ color: palette.contrast }}
-            >
-              로그인이 필요합니다
-            </h1>
-            <p style={{ color: palette.contrast, opacity: 0.7 }}>
-              일기를 저장하고 관리하려면 로그인해주세요.
-            </p>
-          </div>
-
-          {/* 버튼 */}
-          <div className="space-y-3">
-            <Button
-              className="w-full h-12 rounded-xl text-base"
-              style={{
-                backgroundColor: palette.contrast,
-                color: palette.primary,
-              }}
-              onClick={() => router.push('/login')}
-            >
-              로그인
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full h-12 rounded-xl text-base"
-              style={{
-                borderColor: palette.cardBorder,
-                color: palette.contrast,
-                backgroundColor: 'transparent',
-              }}
-              onClick={() => router.push('/signup')}
-            >
-              회원가입
-            </Button>
-          </div>
-        </div>
-      </motion.div>
-    </div>
-  );
-};
-
 const ProfilePage: FC = () => {
+  const router = useRouter();
   const { user, isLoading } = useAuth();
 
   // 오늘의 색상
@@ -153,18 +58,17 @@ const ProfilePage: FC = () => {
     [todayColor.hex]
   );
 
-  if (isLoading) {
+  // 로그인하지 않은 경우 로그인 페이지로 리다이렉트
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.replace('/login');
+    }
+  }, [isLoading, user, router]);
+
+  if (isLoading || !user) {
     return (
       <ImmersiveBackground color={todayColor.hex}>
         <ProfileSkeleton palette={palette} />
-      </ImmersiveBackground>
-    );
-  }
-
-  if (!user) {
-    return (
-      <ImmersiveBackground color={todayColor.hex}>
-        <LoginPrompt palette={palette} />
       </ImmersiveBackground>
     );
   }
