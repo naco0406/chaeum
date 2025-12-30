@@ -14,6 +14,7 @@ interface CalendarGridProps {
   isLoading: boolean;
   direction: number;
   monthKey: string;
+  contrastColor?: string;
 }
 
 export const CalendarGrid: FC<CalendarGridProps> = ({
@@ -22,6 +23,7 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
   isLoading,
   direction,
   monthKey,
+  contrastColor,
 }) => {
   const variants = {
     enter: (direction: number) => ({
@@ -43,7 +45,12 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
       <div className="grid grid-cols-7 gap-1">
         {Array.from({ length: 42 }).map((_, index) => (
           <div key={index} className="aspect-square p-1">
-            <Skeleton className="w-full h-full rounded-lg" />
+            <Skeleton
+              className="w-full h-full rounded-lg"
+              style={{
+                backgroundColor: contrastColor ? `${contrastColor}10` : undefined,
+              }}
+            />
           </div>
         ))}
       </div>
@@ -77,6 +84,7 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
                 day={day}
                 color={color}
                 diary={diary}
+                contrastColor={contrastColor}
               />
             );
           })}

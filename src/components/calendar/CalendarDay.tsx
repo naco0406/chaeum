@@ -12,13 +12,20 @@ interface CalendarDayProps {
   day: CalendarDayType;
   color: DailyColor;
   diary?: Diary;
+  contrastColor?: string;
 }
 
-export const CalendarDay: FC<CalendarDayProps> = ({ day, color, diary }) => {
+export const CalendarDay: FC<CalendarDayProps> = ({
+  day,
+  color,
+  diary,
+  contrastColor,
+}) => {
   const router = useRouter();
   const hasDiary = !!diary;
   const isSunday = day.date.getDay() === 0;
   const isSaturday = day.date.getDay() === 6;
+  const textColor = contrastColor || 'currentColor';
 
   const handleClick = () => {
     if (!day.isCurrentMonth) return;
@@ -31,34 +38,46 @@ export const CalendarDay: FC<CalendarDayProps> = ({ day, color, diary }) => {
     }
   };
 
+  // 날짜 숫자 색상 결정
+  const getDateColor = () => {
+    if (!day.isCurrentMonth) {
+      return contrastColor ? `${contrastColor}30` : 'var(--muted-foreground)';
+    }
+    if (day.isToday) {
+      return textColor;
+    }
+    // 일요일/토요일 색상은 대비색이 있을 때는 살짝 다른 투명도로 표시
+    if (isSunday || isSaturday) {
+      return contrastColor ? textColor : isSunday ? 'rgb(248, 113, 113)' : 'rgb(96, 165, 250)';
+    }
+    return textColor;
+  };
+
   return (
     <motion.button
       onClick={handleClick}
       disabled={!day.isCurrentMonth}
       whileHover={day.isCurrentMonth ? { scale: 1.08 } : undefined}
       whileTap={day.isCurrentMonth ? { scale: 0.95 } : undefined}
-      className={`
-        relative aspect-square flex flex-col items-center justify-center p-1 rounded-xl
-        transition-all duration-200
-        ${day.isCurrentMonth ? 'cursor-pointer hover:bg-secondary/50' : 'cursor-default opacity-30'}
-        ${day.isToday ? 'bg-primary/5' : ''}
-      `}
+      className="relative aspect-square flex flex-col items-center justify-center p-1 rounded-xl transition-all duration-200"
+      style={{
+        cursor: day.isCurrentMonth ? 'pointer' : 'default',
+        opacity: day.isCurrentMonth ? 1 : 0.3,
+        backgroundColor: day.isToday
+          ? contrastColor
+            ? `${contrastColor}15`
+            : 'var(--primary-5)'
+          : undefined,
+      }}
     >
       {/* 날짜 숫자 */}
       <span
-        className={`
-          text-sm z-10 mb-1 font-medium
-          ${day.isToday ? 'text-primary font-bold' : ''}
-          ${
-            !day.isCurrentMonth
-              ? 'text-muted-foreground/40'
-              : isSunday
-                ? 'text-red-400'
-                : isSaturday
-                  ? 'text-blue-400'
-                  : 'text-foreground'
-          }
-        `}
+        className="text-sm z-10 mb-1"
+        style={{
+          color: getDateColor(),
+          fontWeight: day.isToday ? 700 : 500,
+          opacity: isSunday || isSaturday ? 0.9 : 1,
+        }}
       >
         {day.dayOfMonth}
       </span>
@@ -85,7 +104,9 @@ export const CalendarDay: FC<CalendarDayProps> = ({ day, color, diary }) => {
         ) : (
           <div
             className="w-7 h-7 rounded-full border-2 border-dashed transition-colors"
-            style={{ borderColor: `${color.hex}30` }}
+            style={{
+              borderColor: contrastColor ? `${contrastColor}25` : `${color.hex}30`,
+            }}
           />
         )}
 
@@ -94,7 +115,11 @@ export const CalendarDay: FC<CalendarDayProps> = ({ day, color, diary }) => {
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-primary border-2 border-background"
+            className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2"
+            style={{
+              backgroundColor: textColor,
+              borderColor: color.hex,
+            }}
           />
         )}
       </div>
@@ -104,7 +129,10 @@ export const CalendarDay: FC<CalendarDayProps> = ({ day, color, diary }) => {
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="absolute inset-1 rounded-xl border-2 border-primary/30 pointer-events-none"
+          className="absolute inset-1 rounded-xl border-2 pointer-events-none"
+          style={{
+            borderColor: contrastColor ? `${contrastColor}40` : 'var(--primary-30)',
+          }}
         />
       )}
     </motion.button>

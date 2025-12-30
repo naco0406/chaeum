@@ -18,7 +18,11 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useAuth } from '@/providers/AuthProvider';
 
-export const LogoutButton: FC = () => {
+interface LogoutButtonProps {
+  contrastColor?: string;
+}
+
+export const LogoutButton: FC<LogoutButtonProps> = ({ contrastColor }) => {
   const router = useRouter();
   const { signOut } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -43,7 +47,12 @@ export const LogoutButton: FC = () => {
         <AlertDialogTrigger asChild>
           <Button
             variant="outline"
-            className="w-full h-12 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/5 border-border/50"
+            className="w-full h-12 rounded-xl"
+            style={{
+              borderColor: contrastColor ? `${contrastColor}25` : 'var(--border-50)',
+              color: contrastColor || 'var(--destructive)',
+              backgroundColor: contrastColor ? `${contrastColor}05` : 'transparent',
+            }}
           >
             <LogOut className="w-4 h-4 mr-2" />
             로그아웃

@@ -1,100 +1,141 @@
 'use client';
 
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { User, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/providers/AuthProvider';
+import { ImmersiveBackground } from '@/components/common/ImmersiveBackground';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { UserStats } from '@/components/profile/UserStats';
 import { SettingsList } from '@/components/profile/SettingsList';
 import { LogoutButton } from '@/components/profile/LogoutButton';
+import { getColorByDate } from '@/lib/color-utils';
+import { createColorPalette } from '@/lib/color-contrast';
 
-const ProfileSkeleton: FC = () => {
+const ProfileSkeleton: FC<{ palette: ReturnType<typeof createColorPalette> }> = ({
+  palette,
+}) => {
   return (
-    <div className="min-h-screen px-4 py-8">
+    <div className="px-4 py-8">
       <div className="max-w-[430px] mx-auto space-y-6">
         <div className="text-center">
-          <Skeleton className="w-20 h-20 rounded-full mx-auto mb-4" />
-          <Skeleton className="h-6 w-32 mx-auto mb-2" />
-          <Skeleton className="h-4 w-48 mx-auto" />
+          <Skeleton
+            className="w-20 h-20 rounded-full mx-auto mb-4"
+            style={{ backgroundColor: palette.cardBg }}
+          />
+          <Skeleton
+            className="h-6 w-32 mx-auto mb-2"
+            style={{ backgroundColor: palette.cardBg }}
+          />
+          <Skeleton
+            className="h-4 w-48 mx-auto"
+            style={{ backgroundColor: palette.cardBg }}
+          />
         </div>
-        <Skeleton className="w-full h-48 rounded-3xl" />
-        <Skeleton className="w-full h-64 rounded-3xl" />
+        <Skeleton
+          className="w-full h-48 rounded-3xl"
+          style={{ backgroundColor: palette.cardBg }}
+        />
+        <Skeleton
+          className="w-full h-64 rounded-3xl"
+          style={{ backgroundColor: palette.cardBg }}
+        />
       </div>
     </div>
   );
 };
 
-const LoginPrompt: FC = () => {
+const LoginPrompt: FC<{ palette: ReturnType<typeof createColorPalette> }> = ({
+  palette,
+}) => {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4">
+    <div className="flex flex-col items-center justify-center px-4 py-20">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         className="max-w-[430px] w-full text-center space-y-8"
       >
-        {/* 아이콘 */}
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-          className="relative inline-block"
+        {/* 카드 */}
+        <div
+          className="p-8 rounded-3xl backdrop-blur-md"
+          style={{
+            backgroundColor: palette.cardBg,
+            border: `1px solid ${palette.cardBorder}`,
+          }}
         >
-          <div
-            className="w-24 h-24 rounded-full flex items-center justify-center mx-auto"
-            style={{
-              background: `linear-gradient(135deg, rgba(var(--theme-color-rgb), 0.15) 0%, rgba(var(--theme-color-rgb), 0.05) 100%)`,
-            }}
-          >
-            <User className="w-12 h-12" style={{ color: 'var(--theme-color)' }} />
-          </div>
+          {/* 아이콘 */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="absolute -top-1 -right-1"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+            className="relative inline-block mb-6"
           >
-            <Sparkles className="w-6 h-6" style={{ color: 'var(--theme-color)', opacity: 0.6 }} />
+            <div
+              className="w-24 h-24 rounded-full flex items-center justify-center mx-auto"
+              style={{
+                backgroundColor: palette.cardBg,
+                border: `1px solid ${palette.cardBorder}`,
+              }}
+            >
+              <User className="w-12 h-12" style={{ color: palette.contrast }} />
+            </div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="absolute -top-1 -right-1"
+            >
+              <Sparkles
+                className="w-6 h-6"
+                style={{ color: palette.contrast, opacity: 0.6 }}
+              />
+            </motion.div>
           </motion.div>
-        </motion.div>
 
-        {/* 텍스트 */}
-        <div className="space-y-2">
-          <h1 className="text-2xl font-serif">로그인이 필요합니다</h1>
-          <p className="text-muted-foreground">
-            일기를 저장하고 관리하려면 로그인해주세요.
-          </p>
-        </div>
+          {/* 텍스트 */}
+          <div className="space-y-2 mb-8">
+            <h1
+              className="text-2xl font-serif"
+              style={{ color: palette.contrast }}
+            >
+              로그인이 필요합니다
+            </h1>
+            <p style={{ color: palette.contrast, opacity: 0.7 }}>
+              일기를 저장하고 관리하려면 로그인해주세요.
+            </p>
+          </div>
 
-        {/* 버튼 */}
-        <div className="space-y-3">
-          <Button
-            className="w-full h-12 rounded-xl text-base"
-            style={{
-              background: `linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color-dark) 100%)`,
-              color: 'var(--theme-color-contrast)',
-            }}
-            onClick={() => router.push('/login')}
-          >
-            로그인
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full h-12 rounded-xl text-base"
-            style={{
-              borderColor: 'var(--theme-color-muted)',
-              color: 'var(--theme-color)',
-            }}
-            onClick={() => router.push('/signup')}
-          >
-            회원가입
-          </Button>
+          {/* 버튼 */}
+          <div className="space-y-3">
+            <Button
+              className="w-full h-12 rounded-xl text-base"
+              style={{
+                backgroundColor: palette.contrast,
+                color: palette.primary,
+              }}
+              onClick={() => router.push('/login')}
+            >
+              로그인
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full h-12 rounded-xl text-base"
+              style={{
+                borderColor: palette.cardBorder,
+                color: palette.contrast,
+                backgroundColor: 'transparent',
+              }}
+              onClick={() => router.push('/signup')}
+            >
+              회원가입
+            </Button>
+          </div>
         </div>
       </motion.div>
     </div>
@@ -104,45 +145,73 @@ const LoginPrompt: FC = () => {
 const ProfilePage: FC = () => {
   const { user, isLoading } = useAuth();
 
+  // 오늘의 색상
+  const todayColor = useMemo(() => getColorByDate(new Date()), []);
+  const palette = useMemo(
+    () => createColorPalette(todayColor.hex),
+    [todayColor.hex]
+  );
+
   if (isLoading) {
-    return <ProfileSkeleton />;
+    return (
+      <ImmersiveBackground color={todayColor.hex}>
+        <ProfileSkeleton palette={palette} />
+      </ImmersiveBackground>
+    );
   }
 
   if (!user) {
-    return <LoginPrompt />;
+    return (
+      <ImmersiveBackground color={todayColor.hex}>
+        <LoginPrompt palette={palette} />
+      </ImmersiveBackground>
+    );
   }
 
   return (
-    <div className="min-h-screen px-4 pt-6 pb-8">
-      <div className="max-w-[430px] mx-auto space-y-6">
-        {/* 헤더 */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-2"
-        >
-          <p className="text-sm text-muted-foreground mb-1">나의 공간</p>
-          <h1 className="text-2xl font-serif">마이페이지</h1>
-        </motion.div>
+    <ImmersiveBackground color={todayColor.hex}>
+      <div className="px-4 pt-6 pb-32">
+        <div className="max-w-[430px] mx-auto space-y-6">
+          {/* 헤더 */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-2"
+          >
+            <p
+              className="text-sm mb-1 tracking-widest uppercase"
+              style={{ color: palette.contrast, opacity: 0.6 }}
+            >
+              나의 공간
+            </p>
+            <h1
+              className="text-2xl font-serif"
+              style={{ color: palette.contrast }}
+            >
+              마이페이지
+            </h1>
+          </motion.div>
 
-        <ProfileHeader user={user} />
-        <UserStats />
-        <SettingsList />
-        <LogoutButton />
+          <ProfileHeader user={user} contrastColor={palette.contrast} />
+          <UserStats contrastColor={palette.contrast} />
+          <SettingsList contrastColor={palette.contrast} />
+          <LogoutButton contrastColor={palette.contrast} />
 
-        {/* 앱 정보 */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="text-center text-xs text-muted-foreground pt-4 space-y-1"
-        >
-          <p className="font-serif text-sm">채움 v1.0.0</p>
-          <p>365일 감정 기록 다이어리</p>
-        </motion.div>
+          {/* 앱 정보 */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="text-center text-xs pt-4 space-y-1"
+            style={{ color: palette.contrast, opacity: 0.5 }}
+          >
+            <p className="font-serif text-sm">채움 v1.0.0</p>
+            <p>365일 감정 기록 다이어리</p>
+          </motion.div>
+        </div>
       </div>
-    </div>
+    </ImmersiveBackground>
   );
 };
 

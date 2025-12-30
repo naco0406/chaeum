@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, useState } from 'react';
+import { FC, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -19,6 +19,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { useAuth } from '@/providers/AuthProvider';
+import { getColorByDate } from '@/lib/color-utils';
+import { createColorPalette } from '@/lib/color-contrast';
 
 const signupSchema = z
   .object({
@@ -45,6 +47,13 @@ export const SignupForm: FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  // 오늘의 색상 팔레트
+  const todayColor = useMemo(() => getColorByDate(new Date()), []);
+  const palette = useMemo(
+    () => createColorPalette(todayColor.hex),
+    [todayColor.hex]
+  );
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -88,18 +97,23 @@ export const SignupForm: FC = () => {
           transition={{ type: 'spring', stiffness: 200, damping: 15 }}
           className="w-24 h-24 mx-auto rounded-full flex items-center justify-center"
           style={{
-            background: `linear-gradient(135deg, rgba(var(--theme-color-rgb), 0.3) 0%, rgba(var(--theme-color-rgb), 0.1) 100%)`,
+            backgroundColor: `${palette.contrast}20`,
           }}
         >
           <CheckCircle2
             className="w-12 h-12"
-            style={{ color: 'var(--theme-color)' }}
+            style={{ color: palette.contrast }}
           />
         </motion.div>
 
         <div>
-          <h2 className="text-2xl font-serif mb-2">가입 완료</h2>
-          <p className="text-muted-foreground">
+          <h2
+            className="text-2xl font-serif mb-2"
+            style={{ color: palette.contrast }}
+          >
+            가입 완료
+          </h2>
+          <p style={{ color: palette.contrast, opacity: 0.7 }}>
             이메일로 인증 링크를 보내드렸습니다.
             <br />
             이메일을 확인해주세요.
@@ -110,8 +124,8 @@ export const SignupForm: FC = () => {
           onClick={() => router.push('/login')}
           className="rounded-xl h-12 px-8"
           style={{
-            background: `linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color-dark) 100%)`,
-            color: 'var(--theme-color-contrast)',
+            backgroundColor: palette.contrast,
+            color: palette.primary,
           }}
         >
           로그인하기
@@ -136,12 +150,12 @@ export const SignupForm: FC = () => {
             transition={{ type: 'spring', stiffness: 200, damping: 15 }}
             className="w-20 h-20 mx-auto rounded-full flex items-center justify-center"
             style={{
-              background: `linear-gradient(135deg, rgba(var(--theme-color-rgb), 0.2) 0%, rgba(var(--theme-color-rgb), 0.05) 100%)`,
+              backgroundColor: `${palette.contrast}15`,
             }}
           >
             <span
               className="text-4xl font-serif"
-              style={{ color: 'var(--theme-color)' }}
+              style={{ color: palette.contrast }}
             >
               채
             </span>
@@ -154,14 +168,19 @@ export const SignupForm: FC = () => {
           >
             <Sparkles
               className="w-5 h-5"
-              style={{ color: 'var(--theme-color)', opacity: 0.6 }}
+              style={{ color: palette.contrast, opacity: 0.6 }}
             />
           </motion.div>
         </div>
 
         <div>
-          <h1 className="text-3xl font-serif">회원가입</h1>
-          <p className="text-muted-foreground mt-2">
+          <h1
+            className="text-3xl font-serif"
+            style={{ color: palette.contrast }}
+          >
+            회원가입
+          </h1>
+          <p style={{ color: palette.contrast, opacity: 0.7 }} className="mt-2">
             채움과 함께 감정을 기록해보세요
           </p>
         </div>
@@ -172,7 +191,11 @@ export const SignupForm: FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="rounded-3xl glass-strong border border-border/30 p-6 shadow-soft"
+        className="rounded-3xl backdrop-blur-md p-6"
+        style={{
+          backgroundColor: palette.cardBg,
+          border: `1px solid ${palette.cardBorder}`,
+        }}
       >
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
@@ -181,14 +204,24 @@ export const SignupForm: FC = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">이메일</FormLabel>
+                  <FormLabel
+                    className="text-sm font-medium"
+                    style={{ color: palette.contrast }}
+                  >
+                    이메일
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type="email"
                       placeholder="example@email.com"
                       autoComplete="email"
                       disabled={isLoading}
-                      className="h-12 rounded-xl bg-background/50 border-border/50 focus:border-primary/50"
+                      className="h-12 rounded-xl"
+                      style={{
+                        backgroundColor: `${palette.contrast}08`,
+                        borderColor: `${palette.contrast}20`,
+                        color: palette.contrast,
+                      }}
                       {...field}
                     />
                   </FormControl>
@@ -201,7 +234,10 @@ export const SignupForm: FC = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">
+                  <FormLabel
+                    className="text-sm font-medium"
+                    style={{ color: palette.contrast }}
+                  >
                     비밀번호
                   </FormLabel>
                   <FormControl>
@@ -210,7 +246,12 @@ export const SignupForm: FC = () => {
                       placeholder="8자 이상 입력하세요"
                       autoComplete="new-password"
                       disabled={isLoading}
-                      className="h-12 rounded-xl bg-background/50 border-border/50 focus:border-primary/50"
+                      className="h-12 rounded-xl"
+                      style={{
+                        backgroundColor: `${palette.contrast}08`,
+                        borderColor: `${palette.contrast}20`,
+                        color: palette.contrast,
+                      }}
                       {...field}
                     />
                   </FormControl>
@@ -223,7 +264,10 @@ export const SignupForm: FC = () => {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">
+                  <FormLabel
+                    className="text-sm font-medium"
+                    style={{ color: palette.contrast }}
+                  >
                     비밀번호 확인
                   </FormLabel>
                   <FormControl>
@@ -232,7 +276,12 @@ export const SignupForm: FC = () => {
                       placeholder="비밀번호를 다시 입력하세요"
                       autoComplete="new-password"
                       disabled={isLoading}
-                      className="h-12 rounded-xl bg-background/50 border-border/50 focus:border-primary/50"
+                      className="h-12 rounded-xl"
+                      style={{
+                        backgroundColor: `${palette.contrast}08`,
+                        borderColor: `${palette.contrast}20`,
+                        color: palette.contrast,
+                      }}
                       {...field}
                     />
                   </FormControl>
@@ -245,7 +294,11 @@ export const SignupForm: FC = () => {
               <motion.p
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-sm text-destructive text-center py-2 px-4 rounded-lg bg-destructive/10"
+                className="text-sm text-center py-2 px-4 rounded-lg"
+                style={{
+                  backgroundColor: `${palette.contrast}10`,
+                  color: palette.contrast,
+                }}
               >
                 {error}
               </motion.p>
@@ -253,10 +306,10 @@ export const SignupForm: FC = () => {
 
             <Button
               type="submit"
-              className="w-full h-12 rounded-xl text-base font-medium shadow-soft"
+              className="w-full h-12 rounded-xl text-base font-medium"
               style={{
-                background: `linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color-dark) 100%)`,
-                color: 'var(--theme-color-contrast)',
+                backgroundColor: palette.contrast,
+                color: palette.primary,
               }}
               disabled={isLoading}
             >
@@ -278,13 +331,14 @@ export const SignupForm: FC = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.4 }}
-        className="text-center text-sm text-muted-foreground"
+        className="text-center text-sm"
+        style={{ color: palette.contrast, opacity: 0.8 }}
       >
         이미 계정이 있으신가요?{' '}
         <Link
           href="/login"
           className="hover:underline font-medium transition-colors"
-          style={{ color: 'var(--theme-color)' }}
+          style={{ color: palette.contrast }}
         >
           로그인
         </Link>

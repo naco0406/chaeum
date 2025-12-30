@@ -1,10 +1,12 @@
 'use client';
 
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Home, Calendar, User, LucideIcon, PenLine } from 'lucide-react';
+import { getColorByDate } from '@/lib/color-utils';
+import { createColorPalette } from '@/lib/color-contrast';
 
 interface NavItemData {
   href: string;
@@ -20,6 +22,12 @@ const navItems: NavItemData[] = [
 
 export const BottomNavigation: FC = () => {
   const pathname = usePathname();
+
+  const todayColor = useMemo(() => getColorByDate(new Date()), []);
+  const palette = useMemo(
+    () => createColorPalette(todayColor.hex),
+    [todayColor.hex]
+  );
 
   const isActive = (href: string): boolean => {
     if (href === '/') {
@@ -46,7 +54,13 @@ export const BottomNavigation: FC = () => {
         }}
         className="pointer-events-auto"
       >
-        <div className="flex items-center gap-1 px-2 py-2 rounded-full glass-strong border border-border/50 shadow-float">
+        <div
+          className="flex items-center gap-1 px-2 py-2 rounded-full backdrop-blur-xl shadow-lg"
+          style={{
+            backgroundColor: palette.navBg,
+            border: `1px solid ${palette.cardBorder}`,
+          }}
+        >
           {navItems.map((item) => {
             const active = isActive(item.href);
             const Icon = item.icon;
@@ -60,19 +74,17 @@ export const BottomNavigation: FC = () => {
                 <motion.div
                   className="relative flex items-center justify-center w-12 h-11 rounded-full transition-colors"
                   style={{
-                    color: active
-                      ? 'var(--theme-color-contrast)'
-                      : undefined,
+                    color: active ? '#ffffff' : palette.navText,
                   }}
                   whileTap={{ scale: 0.92 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                 >
-                  {/* 활성 상태 배경 - 테마 색상 */}
+                  {/* 활성 상태 배경 */}
                   {active && (
                     <motion.div
                       layoutId="nav-active-bg"
                       className="absolute inset-0 rounded-full"
-                      style={{ backgroundColor: 'var(--theme-color)' }}
+                      style={{ backgroundColor: palette.cardBg }}
                       transition={{
                         type: 'spring',
                         stiffness: 400,
@@ -83,9 +95,10 @@ export const BottomNavigation: FC = () => {
 
                   {/* 아이콘 */}
                   <motion.div
-                    className={`relative z-10 ${
-                      !active ? 'text-muted-foreground hover:text-foreground' : ''
-                    }`}
+                    className="relative z-10"
+                    style={{
+                      opacity: active ? 1 : 0.7,
+                    }}
                     animate={active ? { scale: [1, 1.1, 1] } : { scale: 1 }}
                     transition={{ duration: 0.25 }}
                   >
@@ -97,25 +110,28 @@ export const BottomNavigation: FC = () => {
           })}
 
           {/* 구분선 */}
-          <div className="w-px h-6 bg-border/50 mx-1" />
+          <div
+            className="w-px h-6 mx-1"
+            style={{ backgroundColor: palette.navTextMuted }}
+          />
 
-          {/* 일기 쓰기 버튼 - 테마 색상 */}
+          {/* 일기 쓰기 버튼 */}
           <Link href="/diary/write">
             <motion.div
               className="relative flex items-center justify-center w-11 h-11 rounded-full shadow-lg"
               style={{
-                background: `linear-gradient(135deg, var(--theme-color) 0%, var(--theme-color-dark) 100%)`,
-                color: 'var(--theme-color-contrast)',
+                background: `linear-gradient(135deg, ${todayColor.hex} 0%, ${palette.darker} 100%)`,
+                color: palette.contrast,
               }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               transition={{ type: 'spring', stiffness: 400, damping: 17 }}
             >
               <PenLine className="w-5 h-5" strokeWidth={2.5} />
-              {/* 글로우 효과 - 테마 색상 */}
+              {/* 글로우 효과 */}
               <div
-                className="absolute inset-0 rounded-full blur-lg -z-10"
-                style={{ backgroundColor: 'var(--theme-color-muted)' }}
+                className="absolute inset-0 rounded-full blur-lg -z-10 opacity-40"
+                style={{ backgroundColor: todayColor.hex }}
               />
             </motion.div>
           </Link>
